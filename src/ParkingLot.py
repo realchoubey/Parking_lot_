@@ -1,37 +1,44 @@
+import sys
 import ParkingSlot
 import ParkingTicket
-import Vehicle
+from Vehicle import *
+
 
 class ParkingLot:
-	instance = None
+	__instance = None
 
 	class __SingleInstance:
-	    def __init__(self, name="MyParkingLot"):
+	    def __init__(self, name):
 	    	self.__name = name
-	    	self.__slots = {}
-	    	self.__vehicle_list = []
+	    	self.slots = {}
+	    	self.vehicle_list = []
 	
 
-	def __init__(self, name, no_slot):
-	   	if not ParkingLot.instance:
-	   		ParkingLot.instance = ParkingLot.__SingleInstance(name)
+	def __init__(self, name="MyParkingLot"):
+	   	if not ParkingLot.__instance:
+	   		ParkingLot.__instance = ParkingLot.__SingleInstance(name)
 	   	else:
-	     	ParkingLot.instance.__name = name
+	   		ParkingLot.__instance.__name = name
 
 
 	def __getattr__(self, name):
-		return getattr(self.instance, name)
+		return getattr(self.__instance, name)
 	
 
 	def create_parking_lot(self, no_of_slot):
-		already_create_slots = self.__slots.size()
+		try:
+			for slot_number in range(1, int(no_of_slot) + 1):
+				self.slots[slot_number] = ParkingSlot.ParkingSlot(slot_number=slot_number)
 
-		for i in range(already_create_slots, no_of_slot + 1):
-			self.__slots[i] = ParkingSlot(slot_number=i)
+		except Exception as e:
+			print("Exception {} occurred while initiating parking lot.".format(e))
+
+		print("Created a parking lot with {} slots".format(no_of_slot))
+		
 
 
 	def __get_next_available_slot(self):
-		available_slots = filter(lambda slot: slot.is_available(), self.__slots.values())
+		available_slots = filter(lambda slot: slot.is_available(), self.slots.values())
 		if not available_slots:
 		    return None
 
@@ -39,59 +46,103 @@ class ParkingLot:
 
 
 	def park(self, reg_number, color):
-		self.park_new_vehicle(vehicle)
+		obj_vehicle = Vehicle(v_number=reg_number, v_color=color)
+		self.park_new_vehicle(obj_vehicle)
 
 
 	def park_new_vehicle(self, vehicle):
 		# Check if parking lot is full or have space:
-		if not self.__is_full():
-			slot = self.__get_next_available_slot()
-			if slot:
-				slot.park_vehicle(vehicle)
-				slot.set_availablity(False)
+		if self.__is_full():
+			try:
+				slot = self.__get_next_available_slot()
+				if slot:
+					slot.park_vehicle(vehicle)
 
-			ticket = ParkingTicket(vehicle, slot)
+				ticket = ParkingTicket.ParkingTicket(vehicle, slot)
+				vehicle.assign_ticket(ticket)
 
-			vehicle.assign_ticket(ticket)
+				self.vehicle_list.append(vehicle)
+
+				print("Allocated slot number: {}".format(slot.get_slot_number()))
+			except Exception as e:
+				print("Exception {} while parking vehicle".format(e))
+		else:
+			print("Sorry, parking lot is full.")
 
 
-			self.__vehicle_list.append(vehicle)
 
+	def __is_full(self):
+		for slot in self.slots.values():
+			if slot.is_available():
+				return True
+
+		return False
 
 	def leave(self, slot_num):
-		slot = self.__slots[slot_num]
-		vehcile = slot.get_parked_vehicle()
-		ticket_assigned = vehcile.get_assigned_ticket()
+		try:
+			slot = self.slots[int(slot_num)]
+			vehcile = slot.get_parked_vehicle()
+			ticket_assigned = vehcile.get_assigned_ticket()
 
-		slot_num = ticket_assigned.get_slot()
-		slot.empty_slot()
+			slot = ticket_assigned.get_slot()
+			slot.empty_slot()
+			print("Slot number {} is free".format(slot_num))
+		except Exception as e:
+			print("Exception {} while leaving".format(e))
+
+
+	def status(self):
+		print("Slot No. \t Registration No. \t Color")
+		for slot in self.slots.values():
+			if not slot.is_available():
+				vehicle = slot.get_parked_vehicle()
+				print("{} \t {} \t {}".format(slot.get_slot_number(),
+					  vehicle.get_reg_number(), vehicle.get_vehicle_color()))
+
+
+	def exit(self):
+		sys.exit()
 
 
 	# Function to get list as per government regulation.
-	def get_vehcile_with_color(self, color):
+	def registration_numbers_for_cars_with_colour(self, color):
 		list_vehicle_reg = []
 
-		for vehicle in self.__vehicle_list:
-			if vehicle.get_color() == color:
-				list_vehicle_reg.append(vehicle.get_reg_number())
+		try:
+			for vehicle in self.vehicle_list:
+				if vehicle.get_vehicle_color() == color:
+					list_vehicle_reg.append(vehicle.get_reg_number())
+		except Exception as e:
+			print("Exception {} while getting cars with colors".format(e))
 
-		return list_vehicle_reg
+		print(list_vehicle_reg)
 
 
 	def slot_number_for_registration_number(self, vehicle_reg_num):
-		for slot_num, vehicle_d in self.__slots.items():
-			if vehicle_d.get_reg_number() == vehicle_reg_num:
-				return slot_num
-
-		return -1
+		try:
+			for slot in self.slots.values():
+				if not slot.is_available():
+					vehicle = slot.get_parked_vehicle()
+					if vehicle.get_reg_number() == vehicle_reg_num:
+						print(slot.get_slot_number())
+						break
+			else:
+				print("Not found")
+		except Exception as e:
+			print("Exception {} while getting slots with registration number".format(e))
 
 
 	def slot_numbers_for_cars_with_colour(self, color):
 		list_slot_number = []
-		for slot_num, vehicle_d in self.__slots.items():
-			if vehicle_d.get_color() == color:
-				list_slot_number.append(slot_num)
+		try:
+			for slot in self.slots.values():
+				if not slot.is_available():
+					vehicle = slot.get_parked_vehicle()
+					if vehicle.get_vehicle_color() == color:
+						list_slot_number.append(slot.get_slot_number())
+		except Exception as e:
+			print("Exception {} while getting slots with colors".format(e))
 
-		return list_slot_number
+		print(list_slot_number)
 
 

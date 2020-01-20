@@ -1,11 +1,13 @@
+from enum import Enum
 import ParkingTicket
 
+
 class VehicleType(Enum):
-  CAR, MOTORBIKE = 1, 2
+	CAR, MOTORBIKE = 1, 2
 
 
 class Vehicle():
-	def __init__(self, v_number, v_type, v_color, ticket=None):
+	def __init__(self, v_number, v_color, v_type=VehicleType.CAR, ticket=None):
 		self.__reg_number = v_number
 		self.__type = v_type
 		self.__color = v_color
@@ -13,6 +15,9 @@ class Vehicle():
 
 	def assign_ticket(self, ticket):
 		self.__ticket = ticket
+
+	def get_assigned_ticket(self):
+		return self.__ticket
 
 	def get_reg_number(self):
 		return self.__reg_number
