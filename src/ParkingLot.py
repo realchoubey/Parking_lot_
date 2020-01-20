@@ -23,7 +23,7 @@ class ParkingLot:
 		return getattr(self.instance, name)
 	
 
-	def create_parking_slots(self, no_of_slot):
+	def create_parking_lot(self, no_of_slot):
 		already_create_slots = self.__slots.size()
 
 		for i in range(already_create_slots, no_of_slot + 1):
@@ -36,6 +36,10 @@ class ParkingLot:
 		    return None
 
 		return sorted(available_slots, key=lambda slot: slot.get_slot_number())[0]
+
+
+	def park(self, reg_number, color):
+		self.park_new_vehicle(vehicle)
 
 
 	def park_new_vehicle(self, vehicle):
@@ -54,7 +58,7 @@ class ParkingLot:
 			self.__vehicle_list.append(vehicle)
 
 
-	def leave_parking_lot(self, slot_num):
+	def leave(self, slot_num):
 		slot = self.__slots[slot_num]
 		vehcile = slot.get_parked_vehicle()
 		ticket_assigned = vehcile.get_assigned_ticket()
@@ -73,14 +77,16 @@ class ParkingLot:
 
 		return list_vehicle_reg
 
-	def get_slot_for_vehicle(self, vehicle_reg_num):
+
+	def slot_number_for_registration_number(self, vehicle_reg_num):
 		for slot_num, vehicle_d in self.__slots.items():
 			if vehicle_d.get_reg_number() == vehicle_reg_num:
 				return slot_num
 
 		return -1
 
-	def get_slot_with_color(self, color):
+
+	def slot_numbers_for_cars_with_colour(self, color):
 		list_slot_number = []
 		for slot_num, vehicle_d in self.__slots.items():
 			if vehicle_d.get_color() == color:
