@@ -81,12 +81,15 @@ class ParkingLot:
 	def leave(self, slot_num):
 		try:
 			slot = self.slots[int(slot_num)]
-			vehcile = slot.get_parked_vehicle()
-			ticket_assigned = vehcile.get_assigned_ticket()
+			if not slot.is_available():
+				vehcile = slot.get_parked_vehicle()
+				ticket_assigned = vehcile.get_assigned_ticket()
 
-			slot = ticket_assigned.get_slot()
-			slot.empty_slot()
-			print("Slot number {} is free".format(slot_num))
+				slot = ticket_assigned.get_slot()
+				slot.empty_slot()
+				print("Slot number {} is free".format(slot_num))
+			else:
+				print("No vehicle parked at slot {}.".format(slot_num))
 		except Exception as e:
 			print("Exception {} while leaving".format(e))
 
