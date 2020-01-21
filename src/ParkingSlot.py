@@ -1,11 +1,28 @@
 from Vehicle import *
+import ParkingTicket
 
 
 class ParkingSlot():
-	def __init__(self, slot_number, vehicle_type=VehicleType.CAR):
+	"""
+	This class represent every slot of parking lot.
+	Every slot will have three things.
+	1. Slot information.
+	2. Vehicle parked.
+	3. Assigned ticket information.
+	"""
+	def __init__(self, slot_number, vehicle_type=VehicleType.CAR, ticket=None):
 		self.__slot_number = slot_number
 		self.__vehicle = None
 		self.__is_available = True
+		self.__ticket = ticket
+
+
+	def assign_ticket(self, ticket):
+		self.__ticket = ticket
+
+
+	def get_assigned_ticket(self):
+		return self.__ticket
 
 
 	def empty_slot(self):

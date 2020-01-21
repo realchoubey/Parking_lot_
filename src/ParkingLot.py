@@ -5,12 +5,20 @@ from Vehicle import *
 
 
 class ParkingLot:
+	"""
+	This is actual class for parking lot and it will be singleton.
+	I will have all the functionality require to operate the parking lot.
+	"""
 	__instance = None
 
 	class __SingleInstance:
 	    def __init__(self, name):
 	    	self.__name = name
+
+	    	# Parking slot information.
 	    	self.slots = {}
+
+	    	# Currently parked vehicles
 	    	self.vehicle_list = []
 	
 
@@ -26,6 +34,9 @@ class ParkingLot:
 	
 
 	def create_parking_lot(self, no_of_slot):
+		"""
+		Helper to create parking slots.
+		"""
 		try:
 			for slot_number in range(1, int(no_of_slot) + 1):
 				self.slots[slot_number] = ParkingSlot.ParkingSlot(slot_number=slot_number)
@@ -51,7 +62,7 @@ class ParkingLot:
 
 
 	def park_new_vehicle(self, vehicle):
-		# Check if parking lot is full or have space:
+		# Check if parking lot is full or have space.
 		if self.__is_full():
 			try:
 				slot = self.__get_next_available_slot()
@@ -59,7 +70,7 @@ class ParkingLot:
 					slot.park_vehicle(vehicle)
 
 				ticket = ParkingTicket.ParkingTicket(vehicle, slot)
-				vehicle.assign_ticket(ticket)
+				slot.assign_ticket(ticket)
 
 				self.vehicle_list.append(vehicle)
 
@@ -72,6 +83,8 @@ class ParkingLot:
 
 
 	def __is_full(self):
+		# Instead of loop over to get nearest 
+		# we can have heap to get nearest slot.
 		for slot in self.slots.values():
 			if slot.is_available():
 				return True
@@ -79,13 +92,18 @@ class ParkingLot:
 		return False
 
 	def leave(self, slot_num):
+		"""
+		Instead of directly emptying slot, I'm here getting the ticket 
+		assigned to slot and then getting slot details because in real world 
+		environment we will have to empty slot as per ticket received from 
+		leaving user.
+		"""
 		try:
 			slot = self.slots[int(slot_num)]
 			if not slot.is_available():
-				vehcile = slot.get_parked_vehicle()
-				ticket_assigned = vehcile.get_assigned_ticket()
-
+				ticket_assigned = slot.get_assigned_ticket()
 				slot = ticket_assigned.get_slot()
+				self.vehicle_list.remove(slot.get_parked_vehicle())
 				slot.empty_slot()
 				print("Slot number {} is free".format(slot_num))
 			else:
@@ -95,6 +113,9 @@ class ParkingLot:
 
 
 	def status(self):
+		"""
+		This print the status of parking lot as asked.
+		"""
 		print("Slot No. \t Registration No. \t Color")
 		for slot in self.slots.values():
 			if not slot.is_available():
