@@ -57,12 +57,15 @@ class ParkingLot:
 
 
 	def park(self, reg_number, color):
+		if not self.__is_parking_created():
+			print("Parking not created yet.")
+			return
 		obj_vehicle = Vehicle(v_number=reg_number, v_color=color)
 		self.park_new_vehicle(obj_vehicle)
 
 
 	def park_new_vehicle(self, vehicle):
-		# Check if parking lot is full or have space.
+		# Check if parking lot is full or have space
 		if self.__is_full():
 			try:
 				slot = self.__get_next_available_slot()
@@ -91,6 +94,12 @@ class ParkingLot:
 
 		return False
 
+	def __is_parking_created(self):
+		if not self.slots:
+			return False
+		else:
+			return True
+
 	def leave(self, slot_num):
 		"""
 		Instead of directly emptying slot, I'm here getting the ticket 
@@ -98,6 +107,10 @@ class ParkingLot:
 		environment we will have to empty slot as per ticket received from 
 		leaving user.
 		"""
+		if not self.__is_parking_created():
+			print("Parking not created yet.")
+			return
+
 		try:
 			slot = self.slots[int(slot_num)]
 			if not slot.is_available():
@@ -116,6 +129,10 @@ class ParkingLot:
 		"""
 		This print the status of parking lot as asked.
 		"""
+		if not self.__is_parking_created():
+			print("Parking not created yet.")
+			return
+
 		print("Slot No. \t Registration No. \t Color")
 		for slot in self.slots.values():
 			if not slot.is_available():
@@ -130,6 +147,10 @@ class ParkingLot:
 
 	# Function to get list as per government regulation.
 	def registration_numbers_for_cars_with_colour(self, color):
+		if not self.__is_parking_created():
+			print("Parking not created yet.")
+			return
+
 		list_vehicle_reg = []
 
 		try:
@@ -143,6 +164,10 @@ class ParkingLot:
 
 
 	def slot_number_for_registration_number(self, vehicle_reg_num):
+		if not self.__is_parking_created():
+			print("Parking not created yet.")
+			return
+
 		try:
 			for slot in self.slots.values():
 				if not slot.is_available():
@@ -157,6 +182,10 @@ class ParkingLot:
 
 
 	def slot_numbers_for_cars_with_colour(self, color):
+		if not self.__is_parking_created():
+			print("Parking not created yet.")
+			return
+
 		list_slot_number = []
 		try:
 			for slot in self.slots.values():
